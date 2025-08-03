@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastline Trio Attack Strategy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .presentation-container {
+            position: relative;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            min-height: 100vh;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide:nth-child(1) { animation-delay: 0.2s; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .slide:nth-child(2) { animation-delay: 0.4s; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .slide:nth-child(3) { animation-delay: 0.6s; background: linear-gradient(135deg, #16213e 0%, #0f3460 100%); }
+        .slide:nth-child(4) { animation-delay: 0.8s; background: linear-gradient(135deg, #0f3460 0%, #533483 100%); }
+        .slide:nth-child(5) { animation-delay: 1.0s; background: linear-gradient(135deg, #533483 0%, #7209b7 100%); }
+        .slide:nth-child(6) { animation-delay: 1.2s; background: linear-gradient(135deg, #7209b7 0%, #a663cc 100%); }
+        .slide:nth-child(7) { animation-delay: 1.4s; background: linear-gradient(135deg, #a663cc 0%, #4facfe 100%); }
+        .slide:nth-child(8) { animation-delay: 1.6s; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .slide h1 {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6)); }
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00f2fe;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide h3 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4facfe;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .operators-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 40px 0;
+        }
+
+        .operator-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .operator-card:hover {
+            transform: scale(1.05);
+            border-color: #00f2fe;
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.3);
+        }
+
+        .operator-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .ace { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+        .osa { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .varora { background: linear-gradient(135deg, #7209b7, #a663cc); }
+
+        .step-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #00f2fe;
+            transform: translateX(-50px);
+            opacity: 0;
+            animation: stepSlide 0.6s ease-out forwards;
+        }
+
+        @keyframes stepSlide {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .step:nth-child(1) { animation-delay: 0.2s; }
+        .step:nth-child(2) { animation-delay: 0.4s; }
+        .step:nth-child(3) { animation-delay: 0.6s; }
+        .step:nth-child(4) { animation-delay: 0.8s; }
+
+        .step h4 {
+            color: #00f2fe;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background: #00f2fe;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .navigation {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: #00f2fe;
+            transform: scale(1.5);
+        }
+
+        .cta {
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        .audio-controls {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .audio-btn {
+            background: linear-gradient(45deg, #00f2fe, #4facfe);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .audio-status {
+            color: #00f2fe;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .tactical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 30px 0;
+        }
+
+        .phase-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .phase-card:hover {
+            border-color: #00f2fe;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .slide h1 { font-size: 2.5rem; }
+            .slide h2 { font-size: 2rem; }
+            .operators-grid { grid-template-columns: 1fr; }
+            .tactical-grid { grid-template-columns: 1fr; }
+            .slide { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Audio Controls -->
+        <div class="audio-controls">
+            <button class="audio-btn" id="playPauseBtn" onclick="toggleAudio()">▶</button>
+            <span class="audio-status" id="audioStatus">Click to play narration</span>
+        </div>
+
+        <!-- Hidden Audio Element -->
+        <audio id="voiceoverAudio" preload="auto">
+            <source src="coastline_voiceover.mp3" type="audio/mpeg">
+            <source src="coastline_voiceover.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+        <!-- Title Slide -->
+        <div class="slide">
+            <h1>COASTLINE TRIO ATTACK</h1>
+            <h2>The Ultimate Strategy Guide</h2>
+            <p style="font-size: 1.3rem; text-align: center; margin-top: 20px; opacity: 0.9; line-height: 1.6; font-style: italic;">
+                "In the world of tactical warfare, few things are as beautiful as perfect coordination.<br>
+                Today, we witness the harmony between <span class="highlight">Ace</span>, <span class="highlight">Osa</span>, and <span class="highlight">Rauora</span>.<br>
+                Three operators. One destiny. Coastline domination."
+            </p>
+            <button class="cta" onclick="scrollToNextSlide()">Begin Strategy</button>
+        </div>
+
+        <!-- Operators Overview -->
+        <div class="slide">
+            <h2>Meet Your Team</h2>
+            <p style="font-size: 1.2rem; text-align: center; margin-bottom: 30px; opacity: 0.9; font-style: italic;">
+                "Every great story begins with its characters..."
+            </p>
+            <div class="operators-grid">
+                <div class="operator-card">
+                    <div class="operator-icon ace">ACE</div>
+                    <h3>Ace</h3>
+                    <p>Hard Breacher</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Turns barriers into opportunities</p>
+                </div>
+                <div class="operator-card">
+                    <div class="operator-icon osa">OSA</div>
+                    <h3>Osa</h3>
+                    <p>Shield Operator</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Where defense becomes offense</p>
+                </div>
+                <div class="operator-card">
+                    <div class="operator-icon varora">RAUORA</div>
+                    <h3>Rauora</h3>
+                    <p>Support Operator</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Calculated precision</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 1: Setup -->
+        <div class="slide">
+            <h2>Phase 1: Initial Setup</h2>
+            <p style="font-size: 1.1rem; text-align: center; margin-bottom: 30px; opacity: 0.9; font-style: italic;">
+                "Like a chess master's opening moves, every assault begins with positioning..."
+            </p>
+            <div class="step-container">
+                <div class="step">
+                    <h4><span class="step-number">1</span>Rauora's DOM Panel</h4>
+                    <p>Places DOM panel on the <span class="highlight">luggage door</span></p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">2</span>Osa's Shield Break</h4>
+                    <p>Shields <span class="highlight">luggage window</span>, then smashes for safe passage</p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">3</span>Aqua Balcony Secured</h4>
+                    <p>The <span class="highlight">Aqua Balcony</span> is now secure</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Breach & Clear -->
+        <div class="slide">
+            <h2>Phase 2: Breach & Clear</h2>
+            <p style="font-size: 1.1rem; text-align: center; margin-bottom: 30px; opacity: 0.9; font-style: italic;">
+                "Then, like thunder breaking silence, Ace makes his move..."
+            </p>
+            <div class="step-container">
+                <div class="step">
+                    <h4><span class="step-number">1</span>Ace's Roof Attack</h4>
+                    <p>SELMA charges breach the <span class="highlight">quad wall</span></p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">2</span>Clear Pink Bar</h4>
+                    <p>Clears defenders from the <span class="highlight">pink bar</span></p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">3</span>Moving the Pieces</h4>
+                    <p>The pieces move across the board</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 3: Aqua Control -->
+        <div class="slide">
+            <h2>Phase 3: Aqua Control</h2>
+            <div class="tactical-grid">
+                <div class="phase-card">
+                    <h3>Rauora's Support</h3>
+                    <p>Place a DOM panel on the <span class="highlight">luggage door</span> to make taking Aqua easier</p>
+                </div>
+                <div class="phase-card">
+                    <h3>Osa's Vent Play</h3>
+                    <p>Go to roof and throw an AID through the vent if defenders are behind <span class="highlight">Aqua bar</span></p>
+                </div>
+                <div class="phase-card">
+                    <h3>Rauora's Follow-up</h3>
+                    <p>Kill defenders as they run away from Osa's AID</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 4: Push Strategy -->
+        <div class="slide">
+            <h2>Phase 4: The Push</h2>
+            <div class="step-container">
+                <div class="step">
+                    <h4><span class="step-number">1</span>Smoke Line-up</h4>
+                    <p>Use smoke grenade to block off the <span class="highlight">billiards double door</span></p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">2</span>Aurora's DOM Panel</h4>
+                    <p>Shoot Aurora DOM panel into the door making it safe to push into Aqua</p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">3</span>Flank Watch</h4>
+                    <p>Once you have Aqua control, AIDs can watch your <span class="highlight">luggage flank from the roof</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 5: Execute -->
+        <div class="slide">
+            <h2>Phase 5: The Execute</h2>
+            <div class="step-container">
+                <div class="step">
+                    <h4><span class="step-number">1</span>Osa's Second Shield</h4>
+                    <p>Place second shield facing into <span class="highlight">billiards</span> after helping with Aqua control</p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">2</span>Distraction Grenade</h4>
+                    <p>Osa throws grenade from behind shield into <span class="highlight">aqua rotate</span> to create noise and force defenders off</p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">3</span>Plant Behind Bomb</h4>
+                    <p>Raora runs in and plants behind the bomb while Ace holds angles from roof</p>
+                </div>
+                <div class="step">
+                    <h4><span class="step-number">4</span>Cover & Hold</h4>
+                    <p>Ace holds rotate angle, Osa covers with shield - perfect execution!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Slide -->
+        <div class="slide">
+            <h1>Master the Strategy</h1>
+            <h2>Share with Your Squad</h2>
+            <p style="font-size: 1.3rem; text-align: center; margin: 30px 0; opacity: 0.9;">
+                Perfect coordination between <span class="highlight">Ace</span>, <span class="highlight">Osa</span>, and <span class="highlight">Varora</span><br>
+                leads to unstoppable Coastline attacks
+            </p>
+            <button class="cta" onclick="restartPresentation()">Restart Presentation</button>
+            <p style="margin-top: 30px; font-size: 1.1rem; opacity: 0.8;">
+                Share this strategy with the two friends you want to dominate Coastline with!
+            </p>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <div class="nav-dot active" onclick="goToSlide(0)"></div>
+        <div class="nav-dot" onclick="goToSlide(1)"></div>
+        <div class="nav-dot" onclick="goToSlide(2)"></div>
+        <div class="nav-dot" onclick="goToSlide(3)"></div>
+        <div class="nav-dot" onclick="goToSlide(4)"></div>
+        <div class="nav-dot" onclick="goToSlide(5)"></div>
+        <div class="nav-dot" onclick="goToSlide(6)"></div>
+        <div class="nav-dot" onclick="goToSlide(7)"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        function updateActiveSlide() {
+            navDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            slides[index].scrollIntoView({ behavior: 'smooth' });
+            updateActiveSlide();
+        }
+
+        function scrollToNextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                goToSlide(currentSlide);
+            }
+        }
+
+        function restartPresentation() {
+            currentSlide = 0;
+            goToSlide(0);
+        }
+
+        // Auto-update current slide based on scroll position
+        window.addEventListener('scroll', () => {
+            const scrollPosition = window.scrollY + window.innerHeight / 2;
+            
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                const slideBottom = slideTop + slide.offsetHeight;
+                
+                if (scrollPosition >= slideTop && scrollPosition < slideBottom) {
+                    if (currentSlide !== index) {
+                        currentSlide = index;
+                        updateActiveSlide();
+                    }
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    goToSlide(currentSlide);
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    goToSlide(currentSlide);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
