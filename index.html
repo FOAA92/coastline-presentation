@@ -322,7 +322,7 @@
     <div class="presentation-container">
         <!-- Audio Controls -->
         <div class="audio-controls">
-            <button class="audio-btn" id="playPauseBtn" onclick="toggleAudio()">▶</button>
+            <button class="audio-btn" id="playPauseBtn">▶</button>
             <span class="audio-status" id="audioStatus">Click to play narration</span>
         </div>
 
@@ -507,6 +507,51 @@
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
         const navDots = document.querySelectorAll('.nav-dot');
+        const audio = document.getElementById('voiceoverAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const audioStatus = document.getElementById('audioStatus');
+
+        // Audio control functions
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    playPauseBtn.innerHTML = '⏸';
+                    audioStatus.textContent = 'Playing narration...';
+                }).catch(e => {
+                    audioStatus.textContent = 'Audio file not found';
+                    console.log('Audio error:', e);
+                });
+            } else {
+                audio.pause();
+                playPauseBtn.innerHTML = '▶';
+                audioStatus.textContent = 'Narration paused';
+            }
+        }
+
+        // Add click event listener to the button
+        document.addEventListener('DOMContentLoaded', function() {
+            playPauseBtn.addEventListener('click', toggleAudio);
+        });
+
+        // Audio event listeners
+        audio.addEventListener('ended', () => {
+            playPauseBtn.innerHTML = '▶';
+            audioStatus.textContent = 'Narration complete';
+        });
+
+        audio.addEventListener('loadstart', () => {
+            audioStatus.textContent = 'Loading narration...';
+        });
+
+        audio.addEventListener('canplay', () => {
+            if (audio.paused) {
+                audioStatus.textContent = 'Click to play narration';
+            }
+        });
+
+        audio.addEventListener('error', () => {
+            audioStatus.textContent = 'Audio file not found';
+        });
 
         function updateActiveSlide() {
             navDots.forEach((dot, index) => {
@@ -530,6 +575,9 @@
         function restartPresentation() {
             currentSlide = 0;
             goToSlide(0);
+            if (!audio.paused) {
+                audio.currentTime = 0;
+            }
         }
 
         // Auto-update current slide based on scroll position
@@ -561,6 +609,9 @@
                     currentSlide--;
                     goToSlide(currentSlide);
                 }
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                toggleAudio();
             }
         });
     </script>
